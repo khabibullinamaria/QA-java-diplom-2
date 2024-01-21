@@ -3,7 +3,9 @@ package main;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import main.models.HttpClient;
+import main.models.Steps;
 import main.models.User;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,21 +46,31 @@ public class CreateUserTests extends BaseTest {
     }
 
     @Test
-    @DisplayName("errorOnIfNotAllFields")
-    public void errorOnIfNotAllFields() {
+    @DisplayName("errorOnNullEmail")
+    public void errorOnNullEmail() {
         User nullEmailUser = new User(null, name , password);
-        User nullNameUser = new User(email, null , password);
-        User nullPassUser = new User(email, name , null);
 
         Response nullEmailResponse = httpClient.callPost(nullEmailUser, "api/auth/register");
         nullEmailResponse.then().assertThat().body("message", equalTo("Email, password and name are required fields"))
                 .and()
                 .statusCode(403);
+    }
+
+    @Test
+    @DisplayName("errorOnNullName")
+    public void errorOnNullName() {
+        User nullNameUser = new User(email, null , password);
 
         Response nullNameResponse = httpClient.callPost(nullNameUser, "api/auth/register");
         nullNameResponse.then().assertThat().body("message", equalTo("Email, password and name are required fields"))
                 .and()
                 .statusCode(403);
+    }
+
+    @Test
+    @DisplayName("errorOnNullPass")
+    public void errorOnNullPass() {
+        User nullPassUser = new User(email, name , null);
 
         Response nullPassResponse = httpClient.callPost(nullPassUser, "api/auth/register");
         nullPassResponse.then().assertThat().body("message", equalTo("Email, password and name are required fields"))
@@ -66,4 +78,9 @@ public class CreateUserTests extends BaseTest {
                 .statusCode(403);
     }
 
+    @After
+    public void tearUp() {
+        String token = Steps.Login(httpClient, email, password);
+        httpClient.callDeleteWithAuth("api/auth/user", token);
+    }
 }

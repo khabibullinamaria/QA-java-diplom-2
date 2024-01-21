@@ -4,7 +4,9 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import main.models.HttpClient;
 import main.models.Login;
+import main.models.Steps;
 import main.models.User;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,5 +47,11 @@ public class LoginTests extends BaseTest {
         response.then().assertThat().body("message", equalTo("email or password are incorrect"))
                 .and()
                 .statusCode(401);
+    }
+
+    @After
+    public void tearUp() {
+        String token = Steps.Login(httpClient, email, password);
+        httpClient.callDeleteWithAuth("api/auth/user", token);
     }
 }

@@ -77,4 +77,16 @@ public class HttpClient {
 
         return response;
     }
+
+    public Response callDeleteWithAuth(String url, String token) {
+        Response response =
+                given()
+                        .header("Content-type", "application/json")
+                        .header("Authorization", token)
+                        .and()
+                        .when()
+                        .delete(url);
+
+        return response;
+    }
 }

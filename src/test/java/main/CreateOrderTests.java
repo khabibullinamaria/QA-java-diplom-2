@@ -3,6 +3,7 @@ package main;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import main.models.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.UUID;
@@ -58,4 +59,9 @@ public class CreateOrderTests extends BaseTest {
         response.then().assertThat().statusCode(500);
     }
 
+    @After
+    public void tearUp() {
+        String token = Steps.Login(httpClient, email, password);
+        httpClient.callDeleteWithAuth("api/auth/user", token);
+    }
 }

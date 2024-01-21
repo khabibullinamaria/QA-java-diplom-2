@@ -3,16 +3,14 @@ package main;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import main.models.HttpClient;
-import main.models.Login;
 import main.models.Steps;
 import main.models.User;
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 public class ChangeUserDataTests extends BaseTest {
@@ -50,5 +48,11 @@ public class ChangeUserDataTests extends BaseTest {
         User user = new User(email, newName, password);
         Response response = httpClient.callPatch(user,"api/auth/user");
         response.then().assertThat().statusCode(401);
+    }
+
+    @After
+    public void tearUp() {
+        String token = Steps.Login(httpClient, email, password);
+        httpClient.callDeleteWithAuth("api/auth/user", token);
     }
 }
